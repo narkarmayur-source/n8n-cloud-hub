@@ -41,7 +41,7 @@ jobs:
             -e DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED="$DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED" \
             -e N8N_ENCRYPTION_KEY="$N8N_ENCRYPTION_KEY" \
             docker.n8n.io/n8nio/n8n:latest \
-            n8n import:workflow --separate --input=/workflows
+            import:workflow --separate --input=/workflows
 
           echo "Listing all workflows in Cloud Neon Database..."
           docker run --rm \
@@ -54,4 +54,4 @@ jobs:
             -e DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED="$DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED" \
             -e N8N_ENCRYPTION_KEY="$N8N_ENCRYPTION_KEY" \
             docker.n8n.io/n8nio/n8n:latest \
-            n8n list:workflow
+            list:workflow
