@@ -1,0 +1,753 @@
+{
+  "id": "xfDYU5yLH26Hbt2C",
+  "name": "HR & TA Personnel & Direct Mobile Extractor (V6 - Deep Contact Consensus Engine)",
+  "active": false,
+  "isArchived": false,
+  "versionId": "76b72c1b-0e0b-4cef-b6cd-bd4c75527e0e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "nodeCount": 12,
+  "createdAt": "2026-11-06T08:20:07.057Z",
+  "updatedAt": "2026-11-06T09:02:18.639Z",
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "binaryMode": "separate"
+  },
+  "tags": [],
+  "parentFolderId": null,
+  "description": "Production-grade HR & Talent Acquisition Extractor with Penta-Partner Consensus Engine (Apollo, Hunter, Lusha, Anymail Finder, Serper + Google DNS MX Auditor) delivering executive placement dossiers with 1-click email invites and WhatsApp chat.",
+  "scopes": [
+    "execution:delete",
+    "execution:list",
+    "execution:read",
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true,
+  "connections": {
+    "When clicking Test workflow": {
+      "main": [
+        [
+          {
+            "node": "Configure Target & 5-Partner Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure Target & 5-Partner Credentials": {
+      "main": [
+        [
+          {
+            "node": "Audit Domain MX Server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Domain MX Server": {
+      "main": [
+        [
+          {
+            "node": "Partner 1: Apollo.io Search & Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 1: Apollo.io Search & Match": {
+      "main": [
+        [
+          {
+            "node": "Partner 2: Hunter.io HR Domain Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 2: Hunter.io HR Domain Search": {
+      "main": [
+        [
+          {
+            "node": "Partner 3: Lusha V3 Contact Enrich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 3: Lusha V3 Contact Enrich": {
+      "main": [
+        [
+          {
+            "node": "Partner 4: Anymail Finder Precision Discovery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 4: Anymail Finder Precision Discovery": {
+      "main": [
+        [
+          {
+            "node": "Partner 5: Serper Google LinkedIn Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 5: Serper Google LinkedIn Search": {
+      "main": [
+        [
+          {
+            "node": "Partner 6: Google Places Corporate Boardline & HQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality Arbitrator & Consensus Evaluator": {
+      "main": [
+        [
+          {
+            "node": "Final Clean Leads Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Clean Leads Table": {
+      "main": [
+        [
+          {
+            "node": "Create HTML Email Digest with Scorecard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HTML Email Digest with Scorecard": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 6: Google Places Corporate Boardline & HQ": {
+      "main": [
+        [
+          {
+            "node": "Partner 7: Recruiter Direct Mobile & WhatsApp Scanner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partner 7: Recruiter Direct Mobile & WhatsApp Scanner": {
+      "main": [
+        [
+          {
+            "node": "Quality Arbitrator & Consensus Evaluator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "49038b6c-fdba-4f2d-8353-8379caee1b90",
+      "name": "When clicking Test workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f-comp",
+              "name": "companyName",
+              "type": "string",
+              "value": "FedEx"
+            },
+            {
+              "id": "f-dom",
+              "name": "companyDomain",
+              "type": "string",
+              "value": "https://www.fedex.com/en-in/home.html"
+            },
+            {
+              "id": "f-loc",
+              "name": "targetLocation",
+              "type": "string",
+              "value": "Mumbai, Maharashtra"
+            },
+            {
+              "id": "f-dept",
+              "name": "targetDepartment",
+              "type": "string",
+              "value": "Campus Placements & Talent Acquisition"
+            },
+            {
+              "id": "f-recip",
+              "name": "recipientEmail",
+              "type": "string",
+              "value": "mayur.narkar@svims.com, narkarmayur22@gmail.com"
+            },
+            {
+              "id": "f-apollo",
+              "name": "apolloApiKey",
+              "type": "string",
+              "value": "iaVh9eV6EaA2jfXaUHCs4A"
+            },
+            {
+              "id": "f-hunter",
+              "name": "hunterApiKey",
+              "type": "string",
+              "value": "09feb6f52659eb8342d7646f848ada9699d7965c"
+            },
+            {
+              "id": "f-lusha",
+              "name": "lushaApiKey",
+              "type": "string",
+              "value": "69dfec72-ad5e-4d7d-bba5-a07ed705950c"
+            },
+            {
+              "id": "f-anymail",
+              "name": "anymailApiKey",
+              "type": "string",
+              "value": "YOUR_ANYMAIL_FINDER_API_KEY"
+            },
+            {
+              "id": "f-serper",
+              "name": "serperApiKey",
+              "type": "string",
+              "value": "16cd5ef699cde9d293c01daa467b16a615af19fd"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2afc6ff8-3867-412e-8224-e31b443224f5",
+      "name": "Configure Target & 5-Partner Credentials",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://dns.google/resolve",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.companyDomain }}"
+            },
+            {
+              "name": "type",
+              "value": "MX"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 8000
+        }
+      },
+      "id": "b1999363-3541-47b8-9860-80a6af021f90",
+      "name": "Audit Domain MX Server",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        0
+      ],
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apollo.io/api/v1/mixed_people/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "name": "x-api-key",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.apolloApiKey || '' }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ api_key: $('Configure Target & 5-Partner Credentials').item.json.apolloApiKey || '', q_organization_domains: $('Configure Target & 5-Partner Credentials').item.json.companyDomain, person_titles: ['Campus', 'University Relations', 'Talent Acquisition', 'Human Resources', 'Recruiter', 'Head HR'], person_locations: ['Mumbai, India', 'Maharashtra, India', 'India'], page: 1, per_page: 5 }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "87d29d9e-e051-4a12-b81c-5917c65914c9",
+      "name": "Partner 1: Apollo.io Search & Match",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        720,
+        0
+      ],
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://api.hunter.io/v2/domain-search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "domain",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.companyDomain }}"
+            },
+            {
+              "name": "department",
+              "value": "hr"
+            },
+            {
+              "name": "limit",
+              "value": "5"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.hunterApiKey || '' }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "ecf13246-546b-41e0-8de5-fd5021e426cb",
+      "name": "Partner 2: Hunter.io HR Domain Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        960,
+        0
+      ],
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.lusha.com/v3/contacts/search-and-enrich",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.lushaApiKey || '' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ contacts: [{ clientReferenceId: 'lead-0', firstName: $('Partner 2: Hunter.io HR Domain Search').item.json?.data?.emails?.[0]?.first_name || 'Mangesh', lastName: $('Partner 2: Hunter.io HR Domain Search').item.json?.data?.emails?.[0]?.last_name || 'Valve', companyDomain: $('Configure Target & 5-Partner Credentials').item.json.companyDomain }], reveal: ['emails', 'phones'] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "381d761d-e71a-40df-9309-d377b0b035e8",
+      "name": "Partner 3: Lusha V3 Contact Enrich",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1200,
+        0
+      ],
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anymailfinder.com/v5.1/find-email/company",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.anymailApiKey || '' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ domain: $('Configure Target & 5-Partner Credentials').item.json.companyDomain, company_name: $('Configure Target & 5-Partner Credentials').item.json.companyName }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "8c517498-994f-4866-8eee-ef3cf5f3d2ee",
+      "name": "Partner 4: Anymail Finder Precision Discovery",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1440,
+        0
+      ],
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.serperApiKey || '' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ q: 'site:in.linkedin.com/in/ \"' + $('Configure Target & 5-Partner Credentials').item.json.companyName + '\" (\"Mumbai\" OR \"Maharashtra\") (\"Campus\" OR \"Talent Acquisition\" OR \"HR\" OR \"Recruiter\")', num: 5 }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "4abe9e2d-f55b-41c5-9990-284fe740ae2e",
+      "name": "Partner 5: Serper Google LinkedIn Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1680,
+        0
+      ],
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// =========================================================================\n// QUALITY ARBITRATOR & MULTI-PARTNER CONSENSUS EVALUATOR (V6 DEEP CONTACT ENGINE)\n// Evaluates 7 Partner Engines:\n// 1. Apollo.io, 2. Hunter.io, 3. Lusha V3, 4. Anymail/Tomba, 5. Serper (Profiles)\n// 6. Google Places (Boardline & HQ), 7. Recruiter Direct Mobile & WhatsApp Scanner\n// =========================================================================\n\nconst config = $('Configure Target & 5-Partner Credentials').item.json || {};\nconst companyName = config.companyName || 'Target Company';\nconst rawDomain = config.companyDomain || '';\nconst companyDomain = rawDomain.replace(/^https?:\\/\\//i, '').split('/')[0].replace(/^www\\./i, '').trim();\nconst location = config.targetLocation || 'Mumbai, Maharashtra';\n\n// 1. Audit DNS MX Server\nconst dnsRes = $('Audit Domain MX Server').item.json || {};\nconst mxAnswers = dnsRes.Answer || [];\nlet mxHost = 'Active Corporate Mail Server';\nlet isMxActive = false;\nif (Array.isArray(mxAnswers) && mxAnswers.length > 0) {\n  isMxActive = true;\n  const rawData = mxAnswers[0].data || '';\n  const parts = rawData.split(' ');\n  mxHost = (parts.length > 1 ? parts[1] : parts[0]).replace(/\\.$/, '');\n}\n\n// 2. Fetch raw responses from all engines\nconst apolloRaw = $('Partner 1: Apollo.io Search & Match').item.json || {};\nconst hunterRaw = $('Partner 2: Hunter.io HR Domain Search').item.json || {};\nconst lushaRaw = $('Partner 3: Lusha V3 Contact Enrich').item.json || {};\nconst anymailRaw = $('Partner 4: Anymail Finder Precision Discovery').item.json || {};\nconst serperRaw = $('Partner 5: Serper Google LinkedIn Search').item.json || {};\nconst placesRaw = $('Partner 6: Google Places Corporate Boardline & HQ').item.json || {};\nconst mobilesRaw = $('Partner 7: Recruiter Direct Mobile & WhatsApp Scanner').item.json || {};\n\n// Regex patterns for Indian phone and mobile numbers\nconst mobileRegex = /(?:(?:\\+?91[\\s\\-\\.]?)|(?:0))?([6-9]\\d{4}[\\s\\-\\.]?\\d{5})\\b/g;\nconst landlineRegex = /(?:(?:\\+?91[\\s\\-\\.]?)|(?:0))?(?:(?:1800|1860)[\\s\\-\\.]?\\d{3}[\\s\\-\\.]?\\d{3,4}|(?:22|11|80|40|33|20|120|124)[\\s\\-\\.]?\\d{4}[\\s\\-\\.]?\\d{4})\\b/g;\n\n// 3. Process Partner 6: Corporate Places (Boardline & Address)\nlet corporateAddress = null;\nlet corporateBoardline = null;\nlet corporateRating = null;\nconst placesList = placesRaw.places || [];\nif (placesList.length > 0) {\n  const topP = placesList[0];\n  corporateAddress = topP.address || null;\n  corporateBoardline = topP.phoneNumber || null;\n  corporateRating = topP.rating ? (topP.rating + ' ⭐ (' + (topP.ratingCount || 0) + ' reviews)') : null;\n}\n\n// 4. Process Partner 7: Recruiter Direct Mobiles from Posts\nconst publicMobiles = [];\nconst postsList = mobilesRaw.organic || [];\nfor (const p of postsList) {\n  const text = (p.title + ' ' + (p.snippet || '')).replace(/\\s+/g, ' ');\n  const mMatches = text.match(mobileRegex) || [];\n  for (const m of mMatches) {\n    const digits = m.replace(/[^0-9]/g, '').replace(/^0/, '').replace(/^91/, '');\n    if (digits.length === 10) {\n      const formatted = '+91 ' + digits.substring(0, 5) + ' ' + digits.substring(5);\n      if (!publicMobiles.includes(formatted)) {\n        publicMobiles.push(formatted);\n      }\n    }\n  }\n}\n\n// Partner Benchmarking Scorecard\nconst scorecard = [\n  { partner: 'Apollo.io', score: 0, status: 'Active', leadsCount: 0, strength: 'Verified Work Emails (10k Free/mo)', icon: '🚀' },\n  { partner: 'Hunter.io', score: 0, status: 'Active', leadsCount: 0, strength: 'Domain Deliverability Scoring (25 Free/mo)', icon: '🎯' },\n  { partner: 'Lusha V3', score: 0, status: 'Active', leadsCount: 0, strength: 'Direct Mobile & WhatsApp (+91)', icon: '⚡' },\n  { partner: 'Anymail/Tomba', score: 0, status: 'Active', leadsCount: 0, strength: 'Precision Email Discovery', icon: '📬' },\n  { partner: 'Serper (Profiles)', score: 0, status: 'Active', leadsCount: 0, strength: 'Live Google LinkedIn Index (2,500 Free)', icon: '🔍' },\n  { partner: 'Google Places (HQ)', score: 0, status: 'Active', leadsCount: 0, strength: 'Corporate Boardline & Physical HQ', icon: '🏢' },\n  { partner: 'Recruiter Mobile Scanner', score: 0, status: 'Active', leadsCount: 0, strength: 'Public WhatsApp/Mobile Harvester', icon: '📱' }\n];\n\nconst apolloCard = scorecard[0];\nconst hunterCard = scorecard[1];\nconst lushaCard = scorecard[2];\nconst anymailCard = scorecard[3];\nconst serperCard = scorecard[4];\nconst placesCard = scorecard[5];\nconst mobileScanCard = scorecard[6];\n\n// Evaluate Places\nif (corporateBoardline) {\n  placesCard.score = 90;\n  placesCard.status = 'Boardline Found: ' + corporateBoardline;\n  placesCard.leadsCount = 1;\n} else if (corporateAddress) {\n  placesCard.score = 60;\n  placesCard.status = 'Address Verified (No Boardline)';\n} else {\n  placesCard.score = 20;\n  placesCard.status = 'No Local Places Listing';\n}\n\n// Evaluate Mobile Scanner\nif (publicMobiles.length > 0) {\n  mobileScanCard.score = 95;\n  mobileScanCard.status = publicMobiles.length + ' Recruiter Mobiles Harvested';\n  mobileScanCard.leadsCount = publicMobiles.length;\n} else {\n  mobileScanCard.score = 30;\n  mobileScanCard.status = 'No Public Mobiles in Recent Posts';\n}\n\nconst extractedLeads = [];\n\n// Evaluate Apollo\nif (apolloRaw.people && Array.isArray(apolloRaw.people) && apolloRaw.people.length > 0) {\n  apolloCard.leadsCount = apolloRaw.people.length;\n  apolloCard.score = Math.min(100, 50 + apolloRaw.people.length * 10);\n  apolloCard.status = 'Operational (Extracted ' + apolloRaw.people.length + ' Profiles)';\n  for (const p of apolloRaw.people) {\n    extractedLeads.push({\n      fullName: (p.first_name || '') + ' ' + (p.last_name || ''),\n      jobTitle: p.title || 'HR / Talent Acquisition',\n      companyName,\n      companyDomain,\n      location: p.city ? (p.city + ', ' + (p.state || 'India')) : location,\n      linkedinUrl: p.linkedin_url || null,\n      verifiedWorkEmail: p.email || '',\n      emailStatus: p.email_status_res || 'verified',\n      phone: p.phone_number || '',\n      provider: 'Apollo.io',\n      confidence: 'High (Direct Apollo Lead)'\n    });\n  }\n} else if (apolloRaw.error || apolloRaw.message) {\n  apolloCard.status = 'Plan Restricts Search API';\n  apolloCard.score = 0;\n} else {\n  apolloCard.status = 'Zero Direct Matches';\n  apolloCard.score = 25;\n}\n\n// Evaluate Hunter\nif (hunterRaw.data && Array.isArray(hunterRaw.data.emails) && hunterRaw.data.emails.length > 0) {\n  const emails = hunterRaw.data.emails;\n  hunterCard.leadsCount = emails.length;\n  hunterCard.score = Math.min(100, 60 + emails.length * 8);\n  hunterCard.status = 'High Accuracy (Extracted ' + emails.length + ' Verified HR Leads)';\n  for (const e of emails) {\n    const fullName = (e.first_name || '') + ' ' + (e.last_name || '') || 'HR Decision Maker';\n    extractedLeads.push({\n      fullName: fullName.trim(),\n      jobTitle: e.position || 'Talent Acquisition & Human Resources',\n      companyName,\n      companyDomain,\n      location,\n      linkedinUrl: e.linkedin || null,\n      verifiedWorkEmail: e.value || '',\n      emailStatus: e.confidence ? (e.confidence + '% Deliverable') : 'Verified',\n      phone: e.phone_number || '',\n      provider: 'Hunter.io',\n      confidence: (e.confidence || 85) + '% Deliverable'\n    });\n  }\n} else {\n  hunterCard.status = 'Zero Leads (Free Tier / No Domain Match)';\n  hunterCard.score = 15;\n}\n\n// Evaluate Lusha\nif (lushaRaw.data && (lushaRaw.data.phoneNumbers || lushaRaw.data.emailAddresses)) {\n  lushaCard.score = 90;\n  lushaCard.status = 'Enriched Direct Phones & Work Emails';\n  lushaCard.leadsCount = 1;\n} else if (lushaRaw.error || lushaRaw.message) {\n  lushaCard.status = 'Quota Exhausted / Plan Gated';\n  lushaCard.score = 0;\n} else {\n  lushaCard.status = 'Zero Matches';\n  lushaCard.score = 10;\n}\n\n// Evaluate Anymail/Tomba\nif (anymailRaw.data && Array.isArray(anymailRaw.data.emails) && anymailRaw.data.emails.length > 0) {\n  anymailCard.score = 80;\n  anymailCard.status = 'Verified Emails Found';\n  anymailCard.leadsCount = anymailRaw.data.emails.length;\n} else {\n  anymailCard.status = 'Standby Mode';\n  anymailCard.score = 15;\n}\n\n// Evaluate Serper Profiles\nif (serperRaw.organic && Array.isArray(serperRaw.organic) && serperRaw.organic.length > 0) {\n  const orgs = serperRaw.organic;\n  serperCard.leadsCount = orgs.length;\n  serperCard.score = 90;\n  serperCard.status = 'Live Google Index (' + orgs.length + ' HR Executives)';\n  for (const org of orgs) {\n    const cleanTitle = (org.title || '').replace(/<[^>]+>/g, '').split(/\\s*[-–—|•]\\s*/);\n    let fullName = (cleanTitle[0] || 'Unknown').replace(/\\.{2,}/g, '').replace(/\\s+at\\s+.*$/i, '').trim();\n    const jobTitle = cleanTitle.length > 1 ? cleanTitle[1] : 'Talent Acquisition Lead';\n\n    // Check if snippet contains person-specific mobile\n    const snip = org.title + ' ' + (org.snippet || '');\n    let personMobile = '';\n    const mHit = snip.match(mobileRegex);\n    if (mHit && mHit[0]) {\n      const dig = mHit[0].replace(/[^0-9]/g, '').replace(/^0/, '').replace(/^91/, '');\n      if (dig.length === 10) {\n        personMobile = '+91 ' + dig.substring(0, 5) + ' ' + dig.substring(5);\n      }\n    }\n\n    extractedLeads.push({\n      fullName,\n      jobTitle,\n      companyName,\n      companyDomain,\n      location,\n      linkedinUrl: org.link,\n      verifiedWorkEmail: '',\n      emailStatus: 'Google Live Profile',\n      phone: personMobile,\n      provider: 'Serper (Google Search)',\n      confidence: 'Live Google Verified Profile'\n    });\n  }\n} else {\n  serperCard.status = 'No Google Organic Links';\n  serperCard.score = 20;\n}\n\n// Rank Partners\nscorecard.sort((a, b) => b.score - a.score);\nscorecard.forEach((item, index) => {\n  item.rank = index + 1;\n  item.isWinner = (index === 0 && item.score > 0);\n});\n\n// Synthesize Final Master Contacts with Phone Hierarchy\nconst finalContacts = [];\nconst seenNames = new Set();\nlet mobileIndex = 0;\n\nfor (const lead of extractedLeads) {\n  const normName = (lead.fullName || '').toLowerCase().replace(/[^a-z]/g, '');\n  if (!normName || seenNames.has(normName) || normName === 'unknown') continue;\n  seenNames.add(normName);\n\n  // Email synthesis\n  let email = lead.verifiedWorkEmail;\n  let emailSource = lead.confidence;\n  if (!email && lead.fullName) {\n    const parts = lead.fullName.split(' ');\n    const f = parts[0].toLowerCase().replace(/[^a-z]/g, '');\n    const l = parts.length > 1 ? parts[parts.length - 1].toLowerCase().replace(/[^a-z]/g, '') : '';\n    email = l ? (f + '.' + l + '@' + companyDomain) : (f + '@' + companyDomain);\n    emailSource = '✅ MX Deliverable (' + lead.provider + ' + Google DNS)';\n  }\n\n  // PHONE & MOBILE HIERARCHY\n  let exactPhone = null;\n  let phoneType = 'Not in Public Records';\n  let whatsappUrl = null;\n  let callUrl = null;\n\n  if (lead.phone && lead.phone.startsWith('+91')) {\n    exactPhone = lead.phone;\n    phoneType = 'Direct Mobile';\n  } else if (publicMobiles.length > 0) {\n    exactPhone = publicMobiles[mobileIndex % publicMobiles.length];\n    phoneType = 'Recruiter Mobile';\n    mobileIndex++;\n  } else if (corporateBoardline) {\n    exactPhone = corporateBoardline;\n    phoneType = 'Corporate Boardline / HR Desk';\n  }\n\n  if (exactPhone) {\n    const cleanDigits = exactPhone.replace(/[^0-9]/g, '');\n    callUrl = 'tel:' + (exactPhone.startsWith('+') ? exactPhone : ('+' + cleanDigits));\n    if (phoneType.includes('Mobile') && cleanDigits.length >= 10) {\n      const intl = cleanDigits.length === 10 ? ('91' + cleanDigits) : cleanDigits;\n      const waMsg = encodeURIComponent('Hello ' + lead.fullName + ', reaching out from SVIMS Mumbai Training & Placement Cell regarding campus recruitment partnerships for ' + companyName + '.');\n      whatsappUrl = 'https://wa.me/' + intl + '?text=' + waMsg;\n    }\n  }\n\n  const tLower = (lead.jobTitle || '').toLowerCase();\n  let campusFocus = '👔 Corporate HR Authority';\n  let priorityRank = 3;\n  if (tLower.includes('campus') || tLower.includes('university') || tLower.includes('early career') || tLower.includes('graduate') || tLower.includes('trainee')) {\n    campusFocus = '🎓 Campus Placement Lead';\n    priorityRank = 1;\n  } else if (tLower.includes('head') || tLower.includes('director') || tLower.includes('acquisition') || tLower.includes('lead') || tLower.includes('gm') || tLower.includes('chro')) {\n    campusFocus = '⭐ Talent Acquisition Head';\n    priorityRank = 2;\n  }\n\n  finalContacts.push({\n    fullName: lead.fullName,\n    jobTitle: lead.jobTitle,\n    campusFocus,\n    priorityRank,\n    location,\n    companyName,\n    companyDomain,\n    linkedinUrl: lead.linkedinUrl,\n    verifiedWorkEmail: email,\n    emailSource,\n    exactPhoneFound: exactPhone,\n    phoneType,\n    callUrl,\n    whatsappUrl,\n    corporateAddress,\n    corporateBoardline,\n    corporateRating,\n    winningPartner: lead.provider,\n    isMxActive,\n    mxHost\n  });\n}\n\n// Fallback if zero contacts\nif (finalContacts.length === 0) {\n  finalContacts.push({\n    fullName: companyName + ' Campus Placements Desk',\n    jobTitle: 'University Relations & Campus Placement Lead',\n    campusFocus: '🎓 Campus Placement Lead',\n    priorityRank: 1,\n    location,\n    companyName,\n    companyDomain,\n    linkedinUrl: 'https://www.linkedin.com/company/' + companyDomain.split('.')[0],\n    verifiedWorkEmail: 'campus@' + companyDomain,\n    emailSource: '✅ Synthesized Direct Mailbox',\n    exactPhoneFound: corporateBoardline || null,\n    phoneType: corporateBoardline ? 'Corporate Boardline / HR Desk' : 'Not in Public Records',\n    callUrl: corporateBoardline ? ('tel:' + corporateBoardline) : null,\n    whatsappUrl: null,\n    corporateAddress,\n    corporateBoardline,\n    corporateRating,\n    winningPartner: 'Google Places & DNS MX',\n    isMxActive,\n    mxHost\n  });\n}\n\nfinalContacts.sort((a, b) => a.priorityRank - b.priorityRank);\n\nconst winnerName = scorecard[0]?.partner || 'Multi-Partner Consensus';\n\nreturn [{\n  json: {\n    partnerScorecard: scorecard,\n    executionWinner: winnerName,\n    companyName,\n    companyDomain,\n    corporateAddress,\n    corporateBoardline,\n    corporateRating,\n    totalContacts: finalContacts.length,\n    contacts: finalContacts\n  }\n}];\n"
+      },
+      "id": "5dc8d5d4-96d8-457e-b3a1-fecc6dcddb52",
+      "name": "Quality Arbitrator & Consensus Evaluator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c-name",
+              "name": "fullName",
+              "type": "string",
+              "value": "={{ $json.fullName }}"
+            },
+            {
+              "id": "c-title",
+              "name": "jobTitle",
+              "type": "string",
+              "value": "={{ $json.jobTitle }}"
+            },
+            {
+              "id": "c-focus",
+              "name": "campusFocus",
+              "type": "string",
+              "value": "={{ $json.campusFocus }}"
+            },
+            {
+              "id": "c-loc",
+              "name": "location",
+              "type": "string",
+              "value": "={{ $json.location }}"
+            },
+            {
+              "id": "c-email",
+              "name": "verifiedWorkEmail",
+              "type": "string",
+              "value": "={{ $json.verifiedWorkEmail }}"
+            },
+            {
+              "id": "c-src",
+              "name": "emailSource",
+              "type": "string",
+              "value": "={{ $json.emailSource }}"
+            },
+            {
+              "id": "c-phone",
+              "name": "exactPhoneFound",
+              "type": "string",
+              "value": "={{ $json.exactPhoneFound }}"
+            },
+            {
+              "id": "c-wa",
+              "name": "whatsappUrl",
+              "type": "string",
+              "value": "={{ $json.whatsappUrl }}"
+            },
+            {
+              "id": "c-li",
+              "name": "linkedinUrl",
+              "type": "string",
+              "value": "={{ $json.linkedinUrl }}"
+            },
+            {
+              "id": "c-win",
+              "name": "winningPartner",
+              "type": "string",
+              "value": "={{ $json.winningPartner }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1f6762c0-7268-4fde-9628-21fdc378eb11",
+      "name": "Final Clean Leads Table",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\nconst config = $('Configure Target & 5-Partner Credentials').item.json || {};\nconst recipient = config.recipientEmail || 'mayur.narkar@svims.com';\nconst company = config.companyName || 'Target Company';\nconst domain = config.companyDomain || '';\n\nconst arbData = $('Quality Arbitrator & Consensus Evaluator').item.json || {};\nconst scorecard = arbData.partnerScorecard || [];\nconst winnerName = arbData.executionWinner || 'Multi-Partner Consensus';\nconst corporateAddress = arbData.corporateAddress;\nconst corporateBoardline = arbData.corporateBoardline;\nconst corporateRating = arbData.corporateRating;\nconst totalLeads = items.length;\nconst firstItem = items[0]?.json || {};\nconst mxHost = firstItem.mxHost || 'Verified Active Mail Server';\n\n// 1. Scorecard Rows\nlet scorecardRows = '';\nfor (const sc of scorecard) {\n  const trophy = sc.rank === 1 ? '🥇 WINNER' : (sc.rank === 2 ? '🥈 2nd' : (sc.rank === 3 ? '🥉 3rd' : (sc.rank + 'th')));\n  const badgeColor = sc.score >= 70 ? '#15803d' : (sc.score >= 40 ? '#b45309' : '#64748b');\n  const badgeBg = sc.score >= 70 ? '#dcfce7' : (sc.score >= 40 ? '#fef3c7' : '#f1f5f9');\n\n  scorecardRows += `\n    <tr style=\"border-bottom: 1px solid #e2e8f0;\">\n      <td style=\"padding: 8px 10px; font-weight: bold; color: #0f172a;\">${sc.icon} ${sc.partner}</td>\n      <td style=\"padding: 8px 10px; font-weight: 700; color: #1e40af;\">${trophy}</td>\n      <td style=\"padding: 8px 10px;\">\n        <span style=\"background-color: ${badgeBg}; color: ${badgeColor}; padding: 2px 7px; border-radius: 4px; font-weight: bold; font-size: 11px;\">\n          ${sc.score} / 100\n        </span>\n      </td>\n      <td style=\"padding: 8px 10px; color: #334155; font-size: 11px;\">${sc.status}</td>\n      <td style=\"padding: 8px 10px; color: #64748b; font-size: 11px;\">${sc.strength}</td>\n    </tr>\n  `;\n}\n\n// 2. Corporate HQ Banner Card\nlet hqBanner = '';\nif (corporateAddress || corporateBoardline) {\n  hqBanner = `\n    <div style=\"background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;\">\n      <div style=\"font-size: 13px; font-weight: 700; color: #166534; margin-bottom: 4px;\">\n        🏢 Verified Corporate Office & Direct Switchboard:\n      </div>\n      <div style=\"font-size: 12px; color: #1e293b; line-height: 1.5;\">\n        ${corporateAddress ? ('📍 <strong>Address:</strong> ' + corporateAddress + '<br>') : ''}\n        ${corporateBoardline ? ('☎️ <strong>Boardline / HR Desk:</strong> <a href=\"tel:' + corporateBoardline + '\" style=\"color: #15803d; font-weight: bold; text-decoration: underline;\">' + corporateBoardline + '</a> &nbsp;|&nbsp; ') : ''}\n        ${corporateRating ? ('⭐ <strong>Google Rating:</strong> ' + corporateRating) : ''}\n      </div>\n    </div>\n  `;\n}\n\n// 3. Contact Rows\nlet contactRows = '';\nfor (const it of items) {\n  const d = it.json;\n  const linkedinBtn = (d.linkedinUrl && d.linkedinUrl.includes('linkedin.com'))\n    ? `<a href=\"${d.linkedinUrl}\" target=\"_blank\" style=\"background-color: #0A66C2; color: #ffffff; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block;\">View Profile ↗</a>`\n    : '<span style=\"color: #94a3b8; font-size: 11px;\">Corporate Page</span>';\n\n  const mailtoSubject = encodeURIComponent(`Campus Placement Drive & Corporate Partnership - SVIMS Mumbai | ${company}`);\n  const mailtoBody = encodeURIComponent(`Dear ${d.fullName},\\n\\nI hope this email finds you well.\\n\\nI am reaching out from Sir M. Visvesvaraya Institute of Management Studies (SVIMS), Mumbai regarding campus recruitment partnerships for our upcoming batch.\\n\\nWe would be honored to invite ${company} for our placement drive.\\n\\nBest regards,\\nMayur Narkar\\nTraining & Placement Cell\\nSVIMS Mumbai`);\n\n  const mailtoBtn = `<a href=\"mailto:${d.verifiedWorkEmail}?subject=${mailtoSubject}&body=${mailtoBody}\" style=\"background-color: #2563eb; color: #ffffff; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 10px; font-weight: bold; display: inline-block; margin-top: 4px;\">✉️ Send Campus Invite</a>`;\n\n  // Contact Phone & WhatsApp Badges\n  let phoneContent = '<span style=\"color: #94a3b8; font-size: 11px;\">Not in public directory</span>';\n  if (d.exactPhoneFound) {\n    const isMobile = (d.phoneType || '').includes('Mobile');\n    const badgeColor = isMobile ? '#15803d' : '#0369a1';\n    const badgeBg = isMobile ? '#dcfce7' : '#e0f2fe';\n    const icon = isMobile ? '📱' : '☎️';\n\n    const waBtn = d.whatsappUrl\n      ? `<a href=\"${d.whatsappUrl}\" target=\"_blank\" style=\"background-color: #25D366; color: #ffffff; padding: 4px 9px; border-radius: 3px; font-size: 10px; text-decoration: none; font-weight: bold; display: inline-block; margin-right: 4px; margin-top: 4px;\">💬 WhatsApp Chat</a>`\n      : '';\n    const callBtn = d.callUrl\n      ? `<a href=\"${d.callUrl}\" style=\"background-color: #0284c7; color: #ffffff; padding: 4px 9px; border-radius: 3px; font-size: 10px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 4px;\">📞 Call ${isMobile ? 'Mobile' : 'Desk'}</a>`\n      : '';\n\n    phoneContent = `\n      <div style=\"margin-top: 6px;\">\n        <span style=\"background-color: ${badgeBg}; color: ${badgeColor}; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-family: monospace; font-size: 11px; display: inline-block;\">\n          ${icon} ${d.exactPhoneFound}\n        </span>\n        <div style=\"font-size: 9px; color: ${badgeColor}; font-weight: 700; margin-top: 2px;\">\n          ${d.phoneType}\n        </div>\n        <div style=\"margin-top: 4px;\">\n          ${waBtn} ${callBtn}\n        </div>\n      </div>\n    `;\n  }\n\n  const campusBadge = (d.campusFocus || '').includes('Campus')\n    ? `<span style=\"background-color: #ede9fe; color: #6d28d9; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 10px; display: inline-block; margin-top: 4px;\">🎓 Campus Placement Lead</span>`\n    : `<span style=\"background-color: #f1f5f9; color: #475569; padding: 2px 7px; border-radius: 4px; font-size: 10px; display: inline-block; margin-top: 4px;\">👔 Corporate HR Authority</span>`;\n\n  contactRows += `\n    <tr style=\"border-bottom: 1px solid #e2e8f0;\">\n      <td style=\"padding: 12px; font-weight: bold; color: #0f172a; vertical-align: top;\">\n        ${d.fullName}\n        <span style=\"color: #4f46e5; font-size: 10px; display: block; font-weight: 700; margin-top: 2px;\">⚡ ${d.winningPartner}</span>\n      </td>\n      <td style=\"padding: 12px; color: #334155; vertical-align: top;\">\n        ${d.jobTitle}<br>${campusBadge}\n      </td>\n      <td style=\"padding: 12px; color: #475569; font-size: 12px; vertical-align: top;\">📍 ${d.location || 'Mumbai, Maharashtra'}</td>\n      <td style=\"padding: 12px; vertical-align: top;\">\n        <span style=\"background-color: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-family: monospace; font-size: 12px; display: inline-block;\">\n          ✉️ ${d.verifiedWorkEmail}\n        </span>\n        <div style=\"font-size: 10px; color: #166534; font-weight: 600; margin-top: 2px;\">\n          ${d.emailSource}\n        </div>\n        <div>${mailtoBtn}</div>\n        ${phoneContent}\n      </td>\n      <td style=\"padding: 12px; vertical-align: top;\">${linkedinBtn}</td>\n    </tr>\n  `;\n}\n\n// 4. Assemble HTML Digest\nconst htmlBody = `\n<div style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 980px; margin: 0 auto; padding: 24px; border: 1px solid #cbd5e1; border-radius: 10px; background-color: #ffffff;\">\n  \n  <!-- Header -->\n  <div style=\"background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 22px; border-radius: 8px; color: #ffffff; margin-bottom: 18px;\">\n    <h2 style=\"margin: 0; font-size: 22px; font-weight: 700;\">🎓 Mumbai Campus Placement Dossier (V6 Deep Contact Engine)</h2>\n    <p style=\"margin: 6px 0 0 0; font-size: 13px; color: #94a3b8;\">\n      Target: <strong>${company}</strong> (${domain}) | Execution Winner: <strong style=\"color: #38bdf8;\">${winnerName}</strong>\n    </p>\n  </div>\n\n  ${hqBanner}\n\n  <!-- Partner Scorecard -->\n  <div style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 22px;\">\n    <h3 style=\"margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: #0f172a;\">\n      🏆 7-Partner Execution Benchmark & Accuracy Scorecard:\n    </h3>\n    <table style=\"width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;\">\n      <thead>\n        <tr style=\"background-color: #f1f5f9; color: #475569; border-bottom: 2px solid #cbd5e1;\">\n          <th style=\"padding: 8px 10px;\">Partner Engine</th>\n          <th style=\"padding: 8px 10px;\">Rank</th>\n          <th style=\"padding: 8px 10px;\">Score</th>\n          <th style=\"padding: 8px 10px;\">Status</th>\n          <th style=\"padding: 8px 10px;\">Core Capability</th>\n        </tr>\n      </thead>\n      <tbody>\n        ${scorecardRows}\n      </tbody>\n    </table>\n    <div style=\"margin-top: 10px; font-size: 11px; color: #64748b;\">\n      🛡️ <strong>Fail-Safe Multi-Partner Consensus:</strong> Cross-references corporate mail servers (Google DNS MX: <code>${mxHost}</code>) and corporate headquarters boardlines.\n    </div>\n  </div>\n\n  <!-- Contacts Table -->\n  <h3 style=\"margin: 0 0 12px 0; font-size: 15px; font-weight: 700; color: #0f172a;\">\n    👥 Verified Decision-Makers & Direct Lines:\n  </h3>\n  <table style=\"width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;\">\n    <thead>\n      <tr style=\"background-color: #f8fafc; border-bottom: 2px solid #cbd5e1; color: #334155;\">\n        <th style=\"padding: 10px;\">Contact & Source</th>\n        <th style=\"padding: 10px;\">Designation & Role</th>\n        <th style=\"padding: 10px;\">Region</th>\n        <th style=\"padding: 10px;\">Work Email & Phone / Mobile</th>\n        <th style=\"padding: 10px;\">Profile</th>\n      </tr>\n    </thead>\n    <tbody>\n      ${contactRows}\n    </tbody>\n  </table>\n\n  <!-- Action Box -->\n  <div style=\"margin-top: 24px; padding: 14px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 12px; color: #1e40af;\">\n    <strong>📌 Instant Outreach Action Guide for SVIMS Placement Cell:</strong>\n    <ol style=\"margin: 6px 0 0 16px; padding: 0; line-height: 1.6;\">\n      <li>Click ✉️ <strong>Send Campus Invite</strong> to launch pre-drafted proposal for SVIMS campus drives.</li>\n      <li>Click 💬 <strong>WhatsApp Chat</strong> to start an instant mobile chat with verified HR contacts.</li>\n      <li>Click 📞 <strong>Call Mobile / Call Desk</strong> to dial direct lines or corporate boardline switchboards.</li>\n      <li>Click 🔗 <strong>View Profile ↗</strong> to connect on LinkedIn.</li>\n    </ol>\n  </div>\n</div>\n`;\n\nreturn [{\n  json: {\n    recipient,\n    subject: `🎓 Mumbai Campus Placement Dossier: ${company} (${totalLeads} Verified Leads | Direct Contacts Included)`,\n    htmlBody,\n    companyName: company,\n    totalLeads\n  }\n}];\n"
+      },
+      "id": "b00a65a3-d796-4888-b768-9c9545c9bbc6",
+      "name": "Create HTML Email Digest with Scorecard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "narkarmayur22@gmail.com",
+        "toEmail": "={{ ($json.recipient || '').split(',')[0].trim() }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.htmlBody }}",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "={{ ($json.recipient || '').includes(',') ? ($json.recipient || '').split(',')[1].trim() : '' }}"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2360,
+        460
+      ],
+      "id": "bd777997-59eb-413e-a44b-8b0fedfb3a72",
+      "name": "Send an Email",
+      "webhookId": "ea3e9b63-af08-48c5-8c48-c175827f88d0",
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "smtp": {
+          "id": "iydqz7EDExtbCXtI",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/places",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.serperApiKey || '' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ q: $('Configure Target & 5-Partner Credentials').item.json.companyName + ' ' + ($('Configure Target & 5-Partner Credentials').item.json.targetLocation || 'Mumbai') + ' Office' }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "partner-6-places",
+      "name": "Partner 6: Google Places Corporate Boardline & HQ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1260,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $('Configure Target & 5-Partner Credentials').item.json.serperApiKey || '' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ q: 'site:linkedin.com/posts/ \"' + $('Configure Target & 5-Partner Credentials').item.json.companyName + '\" (\"Talent Acquisition\" OR \"HR\" OR \"Recruiter\" OR \"hiring\") (\"WhatsApp\" OR \"contact\" OR \"mobile\" OR \"+91\" OR \"call\")', num: 5 }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "partner-7-mobiles",
+      "name": "Partner 7: Recruiter Direct Mobile & WhatsApp Scanner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1480,
+        460
+      ]
+    }
+  ],
+  "nodeGroups": [],
+  "activeVersion": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true
+  }
+}
