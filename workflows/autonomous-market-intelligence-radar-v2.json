@@ -1,0 +1,458 @@
+{
+  "name": "Autonomous Market & Competitor Intelligence Engine V2 (Horizon & Startup Radar)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "market-radar-v2-form",
+        "formTitle": "Market & Competitor Intelligence Radar V2 (Real-Time Live Edition)",
+        "formDescription": "Enter any company name (and optional specific product / industry) to generate an institutional-grade 360\u00b0 competitive intelligence audit grounded in REAL-TIME live news, Gartner quadrant modeling, feature parity matrix, customer churn signals, and sales kill-sheets.",
+        "responseMode": "onReceived",
+        "responseData": "\ud83d\ude80 Institutional-Grade Real-Time Radar Audit initiated! Live market news, community disruptors, and strategic matrices are compiling. Your mobile-optimized executive briefing will arrive in Gmail and Google Sheets in ~35 seconds.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Company Name or Website URL",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Specific Product Name (Optional)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Industry or Category (Optional)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Recipient Email",
+              "fieldType": "email",
+              "requiredField": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "trigger-form-v2",
+      "name": "On Form Submission (V2)",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        160
+      ],
+      "webhookId": "market-radar-v2-form"
+    },
+    {
+      "parameters": {},
+      "id": "trigger-manual-v2",
+      "name": "When clicking \u2018Execute workflow\u2019",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 1,15 * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-schedule-v2",
+      "name": "Schedule: Bi-Weekly Horizon Scan",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// Support both Form submission and Manual / Scheduled trigger inputs\nconst rawCompany = input[\"Company Name or Website URL\"] || input.companyName || input.company || \"Supabase\";\nconst rawProduct = input[\"Specific Product Name (Optional)\"] || input.productName || input.product || \"\";\nconst rawIndustry = input[\"Industry or Category (Optional)\"] || input.industry || \"Cloud Databases & Developer Platforms\";\nconst recipientEmail = input[\"Recipient Email\"] || input.recipientEmail || \"mayur.narkar@svims.com\";\n\nconst isProductSpecific = Boolean(rawProduct && rawProduct.trim().length > 0);\nconst targetScope = isProductSpecific ? \"PRODUCT_SPECIFIC_AUDIT\" : \"ENTERPRISE_HOLISTIC_AUDIT\";\nconst targetTitle = isProductSpecific ? `${rawCompany.trim()} (${rawProduct.trim()})` : rawCompany.trim();\n\nlet domain = rawCompany.trim();\nif (!domain.startsWith('http://') && !domain.startsWith('https://')) {\n  if (domain.includes('.')) {\n    domain = 'https://' + domain;\n  } else {\n    domain = `https://www.${domain.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;\n  }\n}\n\nconst query = `${rawCompany.trim()} ${rawProduct ? rawProduct.trim() : ''} launch OR funding OR competitor OR pricing OR acquisition`;\nconst newsSearchUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;\nconst hnSearchUrl = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(rawCompany.trim() + ' alternative OR launch')}&tags=story&hitsPerPage=6`;\n\nreturn {\n  json: {\n    companyName: rawCompany.trim(),\n    productName: isProductSpecific ? rawProduct.trim() : null,\n    industry: rawIndustry.trim(),\n    isProductSpecific,\n    targetScope,\n    targetTitle,\n    resolvedDomain: domain,\n    newsSearchUrl,\n    hnSearchUrl,\n    recipientEmail\n  }\n};"
+      },
+      "id": "resolve-scope-v2",
+      "name": "Resolve Target & Horizon Scope",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.newsSearchUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "fetch-live-news-v2",
+      "name": "Fetch Live Market News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Resolve Target & Horizon Scope').first().json.hnSearchUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "fetch-community-signals-v2",
+      "name": "Fetch Community Signals & Disruptors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        740,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const scope = $('Resolve Target & Horizon Scope').first().json;\nconst newsRaw = $('Fetch Live Market News').first().json;\nconst hnRaw = $('Fetch Community Signals & Disruptors').first().json;\n\nlet newsItems = [];\ntry {\n  const xml = typeof newsRaw === 'string' ? newsRaw : (newsRaw.data || JSON.stringify(newsRaw));\n  const itemRegex = /<item>([\\s\\S]*?)<\\/item>/gi;\n  let match;\n  while ((match = itemRegex.exec(xml)) !== null && newsItems.length < 6) {\n    const itemContent = match[1];\n    const titleMatch = /<title>([\\s\\S]*?)<\\/title>/i.exec(itemContent);\n    const pubDateMatch = /<pubDate>([\\s\\S]*?)<\\/pubDate>/i.exec(itemContent);\n    const sourceMatch = /<source[^>]*>([\\s\\S]*?)<\\/source>/i.exec(itemContent);\n    if (titleMatch) {\n      const cleanTitle = titleMatch[1].replace(/<!\\[CDATA\\[(.*?)\\]\\]>/gi, '$1').replace(/<[^>]+>/g, '').trim();\n      if (!cleanTitle.includes('Google News') && cleanTitle.length > 10) {\n        newsItems.push({\n          title: cleanTitle,\n          pubDate: pubDateMatch ? pubDateMatch[1].trim() : 'Recent',\n          source: sourceMatch ? sourceMatch[1].trim() : 'Industry Press'\n        });\n      }\n    }\n  }\n} catch (e) {}\n\nlet hnItems = [];\ntry {\n  const hits = hnRaw?.hits || [];\n  for (const h of hits.slice(0, 5)) {\n    if (h.title) {\n      hnItems.push({\n        title: h.title,\n        points: h.points || 0,\n        comments: h.num_comments || 0,\n        date: h.created_at ? h.created_at.slice(0, 10) : 'Recent'\n      });\n    }\n  }\n} catch (e) {}\n\nconst currentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });\n\nlet liveTelemetryText = `CURRENT INTELLIGENCE AUDIT DATE: ${currentDateStr}\\n\\n`;\nif (newsItems.length > 0) {\n  liveTelemetryText += \"VERIFIED LIVE BREAKING NEWS & FINANCIAL TELEMETRY:\\n\";\n  newsItems.forEach(n => {\n    liveTelemetryText += `* [${n.pubDate}] (${n.source}) ${n.title}\\n`;\n  });\n  liveTelemetryText += \"\\n\";\n}\nif (hnItems.length > 0) {\n  liveTelemetryText += \"COMMUNITY DISRUPTOR & SENTIMENT SIGNALS:\\n\";\n  hnItems.forEach(h => {\n    liveTelemetryText += `* [${h.date}] \"${h.title}\" (${h.points} upvotes, ${h.comments} comments)\\n`;\n  });\n}\n\nconst prompt = `You are a Senior Partner at McKinsey & Company, Chief Strategy Officer, and Gartner Research Director.\nConduct an institutional-grade, rigorous COMPETITIVE & MARKET INTELLIGENCE AUDIT on:\n\nTARGET COMPANY / ENTITY:\n- Company Name: ${scope.companyName}\n- Domain: ${scope.resolvedDomain}\n- Industry Space: ${scope.industry}\n- Audit Scope: ${scope.targetScope}\n${scope.isProductSpecific ? `- Specific Product Line Focus: \"${scope.productName}\"` : '- Holistic Umbrella Entity'}\n\n${liveTelemetryText}\n\nCRITICAL RESEARCH GUIDELINES:\n1. MAXIMUM FACTS & HARD NUMBERS: Whenever applicable, provide exact dollar figures, valuations, funding amounts, market size (TAM & CAGR), specific pricing tiers ($/mo, $/MAU, overages, seat pricing), latency metrics (ms), and scale indicators.\n2. Ground your analysis in the REAL-TIME BREAKING TELEMETRY provided above. If acquisitions, funding rounds, or pricing controversies broke recently, incorporate them directly into your findings.\n3. Categorize competitors systematically across the Gartner Magic Quadrant (Leaders, Visionary Challengers, Niche Specialists).\n4. Provide a 4-pillar Feature Parity Matrix with quantitative benchmarks, Churn Driver Index, Blue Ocean Whitespaces with addressable dollar potentials, Preemptive 30/60/90 Day Roadmap, and The War Room Sales Kill-Sheet.\n\nReturn ONLY a pure JSON object conforming strictly to the responseSchema.`;\n\nreturn {\n  json: {\n    ...scope,\n    newsItems,\n    hnItems,\n    currentDateStr,\n    liveTelemetryText,\n    prompt\n  }\n};"
+      },
+      "id": "synthesize-signals-v2",
+      "name": "Synthesize Signals & Build Master Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "={{ .GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  JSON.stringify({\n    contents: [\n      {\n        parts: [\n          { text: $json.prompt }\n        ]\n      }\n    ],\n    generationConfig: {\n      responseMimeType: \"application/json\",\n      responseSchema: {\n        type: \"OBJECT\",\n        properties: {\n          market_metrics: {\n            type: \"OBJECT\",\n            properties: {\n              tam_and_cagr: { type: \"STRING\" },\n              pricing_benchmark_summary: { type: \"STRING\" },\n              industry_maturity_stage: { type: \"STRING\", enum: [\"EMERGING\", \"HIGH_GROWTH\", \"MATURING\", \"COMMODITIZING\"] }\n            },\n            required: [\"tam_and_cagr\", \"pricing_benchmark_summary\", \"industry_maturity_stage\"]\n          },\n          breaking_market_telemetry: {\n            type: \"ARRAY\",\n            items: {\n              type: \"OBJECT\",\n              properties: {\n                headline: { type: \"STRING\" },\n                source_and_date: { type: \"STRING\" },\n                hard_figures_or_financials: { type: \"STRING\" },\n                strategic_implication: { type: \"STRING\" }\n              },\n              required: [\"headline\", \"source_and_date\", \"hard_figures_or_financials\", \"strategic_implication\"]\n            }\n          },\n          market_leaders: {\n            type: \"ARRAY\",\n            items: {\n              type: \"OBJECT\",\n              properties: {\n                name: { type: \"STRING\" },\n                domain: { type: \"STRING\" },\n                role: { type: \"STRING\" },\n                threat_score: { type: \"INTEGER\" },\n                estimated_scale_or_valuation: { type: \"STRING\" },\n                pricing_breakdown: { type: \"STRING\" },\n                core_moat: { type: \"STRING\" },\n                vulnerability: { type: \"STRING\" }\n              },\n              required: [\"name\", \"domain\", \"role\", \"threat_score\", \"estimated_scale_or_valuation\", \"pricing_breakdown\", \"core_moat\", \"vulnerability\"]\n            }\n          },\n          visionary_challengers: {\n            type: \"ARRAY\",\n            items: {\n              type: \"OBJECT\",\n              properties: {\n                name: { type: \"STRING\" },\n                domain: { type: \"STRING\" },\n                capital_and_backing: { type: \"STRING\" },\n                disruption_angle: { type: \"STRING\" },\n                growth_velocity: { type: \"STRING\", enum: [\"SURGING\", \"STEADY\", \"EARLY\"] },\n                threat_level: { type: \"STRING\", enum: [\"CRITICAL\", \"HIGH\", \"MEDIUM\", \"LOW\"] },\n                acquisition_target_note: { type: \"STRING\" }\n              },\n              required: [\"name\", \"domain\", \"capital_and_backing\", \"disruption_angle\", \"growth_velocity\", \"threat_level\", \"acquisition_target_note\"]\n            }\n          },\n          feature_parity_matrix: {\n            type: \"ARRAY\",\n            items: {\n              type: \"OBJECT\",\n              properties: {\n                capability: { type: \"STRING\" },\n                target_status: { type: \"STRING\", enum: [\"LEADER\", \"PARITY\", \"LAGGING\"] },\n                leader_status: { type: \"STRING\", enum: [\"LEADER\", \"PARITY\", \"LAGGING\"] },\n                challenger_status: { type: \"STRING\", enum: [\"LEADER\", \"PARITY\", \"LAGGING\"] },\n                quantitative_benchmark: { type: \"STRING\" },\n                strategic_takeaway: { type: \"STRING\" }\n              },\n              required: [\"capability\", \"target_status\", \"leader_status\", \"challenger_status\", \"quantitative_benchmark\", \"strategic_takeaway\"]\n            }\n          },\n          customer_churn_drivers: {\n            type: \"ARRAY\",\n            items: {\n              type: \"OBJECT\",\n              properties: {\n                friction_trigger: { type: \"STRING\" },\n                vulnerable_rival: { type: \"STRING\" },\n                exact_pricing_or_technical_complaint: { type: \"STRING\" },\n                conquesting_pitch: { type: \"STRING\" }\n              },\n              required: [\"friction_trigger\", \"vulnerable_rival\", \"exact_pricing_or_technical_complaint\", \"conquesting_pitch\"]\n            }\n          },\n          blue_ocean_opportunities: {\n            type: \"ARRAY\",\n            items: {\n              type: \"OBJECT\",\n              properties: {\n                title: { type: \"STRING\" },\n                underserved_segment: { type: \"STRING\" },\n                addressable_dollar_potential: { type: \"STRING\", enum: [\"MASSIVE ($1B+)\", \"VERY_HIGH ($500M+)\", \"HIGH ($100M+)\"] },\n                why_rivals_ignore_it: { type: \"STRING\" }\n              },\n              required: [\"title\", \"underserved_segment\", \"addressable_dollar_potential\", \"why_rivals_ignore_it\"]\n            }\n          },\n          preemptive_roadmap: {\n            type: \"OBJECT\",\n            properties: {\n              thirty_day_action: { type: \"STRING\" },\n              sixty_day_action: { type: \"STRING\" },\n              ninety_day_action: { type: \"STRING\" }\n            },\n            required: [\"thirty_day_action\", \"sixty_day_action\", \"ninety_day_action\"]\n          },\n          war_room_kill_sheet: {\n            type: \"OBJECT\",\n            properties: {\n              silver_bullet_pitch: { type: \"STRING\" },\n              lethal_trap_questions: { type: \"ARRAY\", items: { type: \"STRING\" } }\n            },\n            required: [\"silver_bullet_pitch\", \"lethal_trap_questions\"]\n          }\n        },\n        required: [\n          \"market_metrics\",\n          \"breaking_market_telemetry\",\n          \"market_leaders\",\n          \"visionary_challengers\",\n          \"feature_parity_matrix\",\n          \"customer_churn_drivers\",\n          \"blue_ocean_opportunities\",\n          \"preemptive_roadmap\",\n          \"war_room_kill_sheet\"\n        ]\n      },\n      temperature: 0.7,\n      maxOutputTokens: 8192\n    }\n  })\n}}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "gemini-master-engine-v2",
+      "name": "Gemini Master Strategy Engine",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1220,
+        340
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "const resp = $input.first().json;\nconst meta = $('Resolve Target & Horizon Scope').first().json;\n\nfunction safeParseJson(raw) {\n  if (!raw || typeof raw !== 'string') return null;\n  let text = raw.trim();\n  const fence = String.fromCharCode(96).repeat(3);\n  if (text.startsWith(fence + 'json')) text = text.slice(7);\n  else if (text.startsWith(fence)) text = text.slice(3);\n  if (text.endsWith(fence)) text = text.slice(0, -3);\n  text = text.trim();\n  try { return JSON.parse(text); } catch (e) {}\n  const start = text.indexOf('{');\n  const end = text.lastIndexOf('}');\n  if (start !== -1 && end > start) {\n    try { return JSON.parse(text.substring(start, end + 1)); } catch (e2) {}\n  }\n  throw new Error(\"Unable to parse JSON from AI response: \" + text.slice(0, 200));\n}\n\nlet intel = null;\nif (resp.candidates && resp.candidates.length > 0) {\n  const parts = resp.candidates[0].content?.parts || [];\n  const rawText = parts.map(p => p.text || '').join('').trim();\n  intel = safeParseJson(rawText);\n} else if (resp.error) {\n  throw new Error(\"Gemini API Error: \" + (resp.error.message || JSON.stringify(resp.error)));\n} else {\n  throw new Error(\"No candidates received from Gemini API\");\n}\n\nconst timestamp = new Date().toISOString();\nconst currentDateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });\nconst formUrl = \"http://localhost:5678/form/market-radar-v2-form\";\n\n// 1. Mobile-friendly Breaking News Ticker\nconst telemetryHtml = (intel.breaking_market_telemetry || []).map(t => `\n  <div style=\"background: #1e293b; border-left: 3px solid #38bdf8; padding: 12px; margin-bottom: 8px; border-radius: 6px;\">\n    <div style=\"font-size: 11px; color: #94a3b8; margin-bottom: 2px;\">\n      <span style=\"color: #38bdf8; font-weight: bold;\">\ud83d\udce1 ${t.source_and_date}</span>\n      ${t.hard_figures_or_financials ? ` \u2022 <strong style=\"color: #fbbf24;\">${t.hard_figures_or_financials}</strong>` : ''}\n    </div>\n    <div style=\"font-size: 13px; font-weight: bold; color: #ffffff; margin-bottom: 4px; line-height: 1.35;\">${t.headline}</div>\n    <div style=\"font-size: 12px; color: #cbd5e1; line-height: 1.4;\"><em>Strategic Impact:</em> ${t.strategic_implication}</div>\n  </div>\n`).join('');\n\n// 2. Mobile-friendly Market Leaders Cards\nconst leadersHtml = (intel.market_leaders || []).map(inc => `\n  <div style=\"background: #1e293b; border-radius: 8px; padding: 14px; margin-bottom: 12px; border: 1px solid #334155;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;\">\n      <span style=\"font-size: 15px; font-weight: bold; color: #ffffff;\">\ud83c\udfe2 ${inc.name}</span>\n      <span style=\"font-size: 11px; font-weight: bold; color: #38bdf8; background: #0c4a6e; padding: 2px 6px; border-radius: 4px;\">${inc.role} \u2022 ${inc.threat_score}/100</span>\n    </div>\n    <div style=\"font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 6px;\">Scale: ${inc.estimated_scale_or_valuation}</div>\n    <div style=\"font-size: 12px; color: #cbd5e1; margin-bottom: 6px; line-height: 1.4;\"><strong>Pricing:</strong> ${inc.pricing_breakdown}</div>\n    <div style=\"background: rgba(16, 185, 129, 0.1); border-left: 2px solid #10b981; padding: 6px 8px; margin-bottom: 6px; font-size: 12px; border-radius: 4px;\">\n      <strong style=\"color: #10b981;\">Core Moat:</strong> <span style=\"color: #e2e8f0;\">${inc.core_moat}</span>\n    </div>\n    <div style=\"background: rgba(239, 68, 68, 0.1); border-left: 2px solid #ef4444; padding: 6px 8px; font-size: 12px; border-radius: 4px;\">\n      <strong style=\"color: #ef4444;\">Vulnerability:</strong> <span style=\"color: #e2e8f0;\">${inc.vulnerability}</span>\n    </div>\n  </div>\n`).join('');\n\n// 3. Mobile-friendly Challenger Cards\nconst challengersHtml = (intel.visionary_challengers || []).map(s => {\n  let badgeBg = \"#7f1d1d\"; let badgeText = \"#fca5a5\";\n  if (s.threat_level === \"MEDIUM\") { badgeBg = \"#78350f\"; badgeText = \"#fcd34d\"; }\n  else if (s.threat_level === \"LOW\") { badgeBg = \"#064e3b\"; badgeText = \"#6ee7b7\"; }\n\n  return `\n    <div style=\"background: #1e293b; border-left: 3px solid #c084fc; border-radius: 8px; padding: 14px; margin-bottom: 12px;\">\n      <div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;\">\n        <span style=\"font-size: 15px; font-weight: bold; color: #ffffff;\">\u26a1 ${s.name}</span>\n        <span style=\"font-size: 10px; font-weight: bold; background: ${badgeBg}; color: ${badgeText}; padding: 2px 6px; border-radius: 4px;\">${s.threat_level} \u2022 ${s.growth_velocity}</span>\n      </div>\n      <div style=\"font-size: 12px; color: #c084fc; margin-bottom: 4px;\"><strong>Backing:</strong> ${s.capital_and_backing}</div>\n      <div style=\"font-size: 12px; color: #cbd5e1; margin-bottom: 4px; line-height: 1.4;\"><strong>Disruptive Angle:</strong> ${s.disruption_angle}</div>\n      <div style=\"font-size: 11px; color: #fbbf24;\"><strong>Acquisition Target:</strong> ${s.acquisition_target_note}</div>\n    </div>\n  `;\n}).join('');\n\n// 4. Mobile-friendly Feature Parity Cards (Replaces wide multi-column table)\nconst parityCardsHtml = (intel.feature_parity_matrix || []).map(m => {\n  function getPill(status, label) {\n    let bg = \"#065f46\"; let text = \"#34d399\";\n    if (status === 'PARITY') { bg = \"#1e3a8a\"; text = \"#60a5fa\"; }\n    else if (status === 'LAGGING') { bg = \"#7f1d1d\"; text = \"#f87171\"; }\n    return `<span style=\"display: inline-block; background: ${bg}; color: ${text}; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-right: 4px; margin-bottom: 4px;\">${label}: ${status}</span>`;\n  }\n  return `\n    <div style=\"background: #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid #334155;\">\n      <div style=\"font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 6px;\">\n        \u2696\ufe0f ${m.capability}\n      </div>\n      <div style=\"margin-bottom: 6px;\">\n        ${getPill(m.target_status, 'Target')}\n        ${getPill(m.leader_status, 'Leader')}\n        ${getPill(m.challenger_status, 'Challenger')}\n      </div>\n      ${m.quantitative_benchmark ? `<div style=\"font-size: 11px; color: #fbbf24; margin-bottom: 4px;\"><strong>Benchmark:</strong> ${m.quantitative_benchmark}</div>` : ''}\n      <div style=\"font-size: 12px; color: #cbd5e1; line-height: 1.4;\"><em>Takeaway:</em> ${m.strategic_takeaway}</div>\n    </div>\n  `;\n}).join('');\n\n// 5. Mobile-friendly Churn Drivers\nconst churnHtml = (intel.customer_churn_drivers || []).map(c => `\n  <div style=\"background: #1e293b; border-left: 3px solid #f43f5e; padding: 12px; border-radius: 6px; margin-bottom: 10px;\">\n    <div style=\"font-size: 13px; font-weight: bold; color: #f43f5e; margin-bottom: 2px;\">\u26a0\ufe0f Churn Trigger: ${c.friction_trigger}</div>\n    <div style=\"font-size: 11px; color: #94a3b8; margin-bottom: 4px;\">Vulnerable Player: <strong style=\"color: #ffffff;\">${c.vulnerable_rival}</strong></div>\n    <div style=\"font-size: 12px; color: #fecdd3; font-style: italic; margin-bottom: 4px; line-height: 1.35;\">\"${c.exact_pricing_or_technical_complaint}\"</div>\n    <div style=\"font-size: 12px; color: #34d399; line-height: 1.4;\"><strong>Conquesting Pitch:</strong> ${c.conquesting_pitch}</div>\n  </div>\n`).join('');\n\n// 6. Mobile-friendly Blue Oceans\nconst blueOceansHtml = (intel.blue_ocean_opportunities || []).map((b, i) => `\n  <div style=\"background: #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid #3b82f6;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;\">\n      <span style=\"font-size: 14px; font-weight: bold; color: #60a5fa;\">\ud83c\udf0a Opportunity ${i+1}: ${b.title}</span>\n      <span style=\"font-size: 10px; font-weight: bold; background: #065f46; color: #34d399; padding: 2px 6px; border-radius: 4px;\">${b.addressable_dollar_potential}</span>\n    </div>\n    <div style=\"font-size: 12px; color: #cbd5e1; margin-bottom: 3px;\"><strong>Target Segment:</strong> ${b.underserved_segment}</div>\n    <div style=\"font-size: 11px; color: #94a3b8;\"><strong>Why Rivals Miss It:</strong> ${b.why_rivals_ignore_it}</div>\n  </div>\n`).join('');\n\n// FULL MOBILE-FIRST RESPONSIVE EMAIL TEMPLATE (Max width 600px, 100% fluid, single column)\nconst emailHtml = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Competitive Radar: ${meta.targetTitle}</title>\n</head>\n<body style=\"margin: 0; padding: 0; background-color: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;\">\n  <div style=\"max-width: 600px; width: 100%; margin: 0 auto; background-color: #0f172a; color: #f8fafc; overflow: hidden; box-sizing: border-box;\">\n    \n    <!-- Top Header -->\n    <div style=\"background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); padding: 22px 16px; border-bottom: 1px solid #334155;\">\n      <div style=\"margin-bottom: 6px;\">\n        <span style=\"display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #38bdf8; background: #032b43; padding: 2px 8px; border-radius: 4px; margin-right: 6px;\">\n          STRATEGY RADAR V2\n        </span>\n        <span style=\"display: inline-block; font-size: 10px; font-weight: 800; color: #34d399; background: #064e3b; padding: 2px 8px; border-radius: 4px;\">\n          \u25cf LIVE TELEMETRY\n        </span>\n      </div>\n      <h1 style=\"margin: 4px 0; font-size: 22px; font-weight: 800; color: #ffffff; line-height: 1.25;\">${meta.targetTitle}</h1>\n      <div style=\"font-size: 12px; color: #94a3b8;\">${meta.industry} \u2022 ${currentDateStr}</div>\n    </div>\n\n    <!-- Main Content Container (Padding 16px for comfortable mobile reading) -->\n    <div style=\"padding: 16px; box-sizing: border-box;\">\n\n      <!-- Market Metrics & TAM Bar -->\n      <div style=\"background: #172554; border: 1px solid #1d4ed8; border-radius: 8px; padding: 12px; margin-bottom: 16px;\">\n        <div style=\"font-size: 11px; font-weight: bold; text-transform: uppercase; color: #93c5fd; margin-bottom: 4px;\">\ud83d\udcca Market Size & TAM Forecast</div>\n        <div style=\"font-size: 13px; font-weight: bold; color: #ffffff; margin-bottom: 4px;\">${intel.market_metrics.tam_and_cagr}</div>\n        <div style=\"font-size: 11px; color: #cbd5e1;\"><strong>Pricing Baseline:</strong> ${intel.market_metrics.pricing_benchmark_summary}</div>\n      </div>\n\n      <!-- Real-Time Breaking Telemetry -->\n      <div style=\"margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; margin-bottom: 8px;\">\n          \ud83d\udce1 Real-Time Breaking Telemetry\n        </div>\n        ${telemetryHtml}\n      </div>\n\n      <!-- Gartner Magic Quadrant: Market Leaders -->\n      <div style=\"margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #38bdf8; margin-bottom: 8px;\">\n          \ud83c\udfe2 Established Market Leaders\n        </div>\n        ${leadersHtml}\n      </div>\n\n      <!-- Visionary Challenger Startups -->\n      <div style=\"margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #c084fc; margin-bottom: 8px;\">\n          \ud83d\ude80 Emerging Startups & Breakout Challengers\n        </div>\n        ${challengersHtml}\n      </div>\n\n      <!-- Feature Parity Scorecard -->\n      <div style=\"margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #10b981; margin-bottom: 8px;\">\n          \u2696\ufe0f Technical Feature Parity Scorecard\n        </div>\n        ${parityCardsHtml}\n      </div>\n\n      <!-- Customer Churn Drivers -->\n      <div style=\"margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #f43f5e; margin-bottom: 8px;\">\n          \ud83d\udc94 Customer Churn Drivers (\"Why Buyers Switch\")\n        </div>\n        ${churnHtml}\n      </div>\n\n      <!-- Blue Ocean Whitespaces -->\n      <div style=\"margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; margin-bottom: 8px;\">\n          \ud83c\udf0a Unclaimed Blue Ocean Opportunities\n        </div>\n        ${blueOceansHtml}\n      </div>\n\n      <!-- Preemptive 30-60-90 Day Roadmap -->\n      <div style=\"background: #1e293b; border: 1px solid #10b981; border-radius: 8px; padding: 14px; margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; color: #34d399; margin-bottom: 8px;\">\n          \ud83d\udee0\ufe0f Preemptive Product Roadmap (30-60-90 Days)\n        </div>\n        <div style=\"font-size: 12px; color: #e2e8f0; line-height: 1.5;\">\n          <div style=\"margin-bottom: 6px;\"><strong>Day 1-30 (Rapid Win):</strong> ${intel.preemptive_roadmap.thirty_day_action}</div>\n          <div style=\"margin-bottom: 6px;\"><strong>Day 31-60 (Moat Builder):</strong> ${intel.preemptive_roadmap.sixty_day_action}</div>\n          <div><strong>Day 61-90 (Game Changer):</strong> ${intel.preemptive_roadmap.ninety_day_action}</div>\n        </div>\n      </div>\n\n      <!-- War Room Sales Kill-Sheet -->\n      <div style=\"background: linear-gradient(135deg, #1e1b4b 0%, #172554 100%); border: 2px solid #3b82f6; border-radius: 8px; padding: 14px; margin-bottom: 18px;\">\n        <div style=\"font-size: 13px; font-weight: 800; text-transform: uppercase; color: #60a5fa; margin-bottom: 8px;\">\n          \u2694\ufe0f The War Room Sales Kill-Sheet\n        </div>\n        <div style=\"background: rgba(15, 23, 42, 0.7); padding: 10px; border-radius: 6px; margin-bottom: 8px;\">\n          <div style=\"font-size: 10px; font-weight: 800; text-transform: uppercase; color: #10b981; margin-bottom: 2px;\">Silver Bullet Value Proposition:</div>\n          <div style=\"font-size: 13px; font-weight: 600; color: #ffffff; line-height: 1.4;\">${intel.war_room_kill_sheet.silver_bullet_pitch}</div>\n        </div>\n        <div style=\"background: rgba(15, 23, 42, 0.7); padding: 10px; border-radius: 6px;\">\n          <div style=\"font-size: 10px; font-weight: 800; text-transform: uppercase; color: #f59e0b; margin-bottom: 4px;\">Lethal Trap Questions to Coach Buyers:</div>\n          <ul style=\"margin: 0; padding-left: 18px; font-size: 12px; color: #fef08a; line-height: 1.4;\">\n            ${(intel.war_room_kill_sheet.lethal_trap_questions || []).map(q => `<li style=\"margin-bottom: 4px;\">\"${q}\"</li>`).join('')}\n          </ul>\n        </div>\n      </div>\n\n      <!-- Mobile Touch CTA Button (Full Width, 48px height) -->\n      <div style=\"margin-top: 10px; margin-bottom: 14px; text-align: center;\">\n        <a href=\"${formUrl}\" target=\"_blank\" style=\"display: block; width: 100%; box-sizing: border-box; background: #9333ea; color: #ffffff; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; text-align: center;\">\n          \u2795 Launch Another Live Audit\n        </a>\n      </div>\n\n    </div>\n  </div>\n</body>\n</html>\n`;\n\n// Build rows for Google Sheets\nconst sheetRows = [];\n\nfor (const inc of (intel.market_leaders || [])) {\n  sheetRows.push({\n    Timestamp: timestamp,\n    Target_Entity: meta.targetTitle,\n    Entity_Name: inc.name,\n    Entity_Type: `Market Leader (${inc.role})`,\n    Domain: inc.domain,\n    Threat_Level: `${inc.threat_score}/100`,\n    Key_Moat_or_Innovation: inc.core_moat,\n    Critical_Vulnerability: inc.vulnerability,\n    Pricing_or_Funding_Model: inc.pricing_breakdown,\n    Market_White_Space: (intel.blue_ocean_opportunities || []).map(w => w.title).join('; '),\n    Actionable_Recommendation: intel.preemptive_roadmap.thirty_day_action\n  });\n}\n\nfor (const s of (intel.visionary_challengers || [])) {\n  sheetRows.push({\n    Timestamp: timestamp,\n    Target_Entity: meta.targetTitle,\n    Entity_Name: s.name,\n    Entity_Type: `Visionary Challenger (${s.growth_velocity})`,\n    Domain: s.domain,\n    Threat_Level: s.threat_level,\n    Key_Moat_or_Innovation: s.disruption_angle,\n    Critical_Vulnerability: s.acquisition_target_note,\n    Pricing_or_Funding_Model: s.capital_and_backing,\n    Market_White_Space: (intel.blue_ocean_opportunities || []).map(w => w.title).join('; '),\n    Actionable_Recommendation: intel.preemptive_roadmap.sixty_day_action\n  });\n}\n\nsheetRows[0].emailHtml = emailHtml;\nsheetRows[0].targetTitle = meta.targetTitle;\nsheetRows[0].recipientEmail = meta.recipientEmail;\n\nreturn sheetRows.map(row => ({ json: row }));"
+      },
+      "id": "format-dispatch-v2",
+      "name": "Format C-Level Mobile Dossier & Sheet Records",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1rn_RoiPQhmT8M4WoVKBkli6TxxgQKchR7ecPvNKMI9Y"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Market_Radar_V2"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.Timestamp }}",
+            "Target_Entity": "={{ $json.Target_Entity }}",
+            "Entity_Name": "={{ $json.Entity_Name }}",
+            "Entity_Type": "={{ $json.Entity_Type }}",
+            "Domain": "={{ $json.Domain }}",
+            "Threat_Level": "={{ $json.Threat_Level }}",
+            "Key_Moat_or_Innovation": "={{ $json.Key_Moat_or_Innovation }}",
+            "Critical_Vulnerability": "={{ $json.Critical_Vulnerability }}",
+            "Pricing_or_Funding_Model": "={{ $json.Pricing_or_Funding_Model }}",
+            "Market_White_Space": "={{ $json.Market_White_Space }}",
+            "Actionable_Recommendation": "={{ $json.Actionable_Recommendation }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Target_Entity",
+              "displayName": "Target_Entity",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Entity_Name",
+              "displayName": "Entity_Name",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Entity_Type",
+              "displayName": "Entity_Type",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Threat_Level",
+              "displayName": "Threat_Level",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Key_Moat_or_Innovation",
+              "displayName": "Key_Moat_or_Innovation",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Critical_Vulnerability",
+              "displayName": "Critical_Vulnerability",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Pricing_or_Funding_Model",
+              "displayName": "Pricing_or_Funding_Model",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Market_White_Space",
+              "displayName": "Market_White_Space",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "id": "Actionable_Recommendation",
+              "displayName": "Actionable_Recommendation",
+              "required": false,
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "append-sheet-v2",
+      "name": "Append to Market Radar V2 Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1740,
+        240
+      ],
+      "continueOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gKFJ1SvneDGqyv2j",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "mayur.narkar@svims.com",
+        "subject": "=\ud83d\udce1 [Market Radar V2] 360\u00b0 Institutional Strategy Dossier: {{ $json.targetTitle }} (Live Telemetry)",
+        "message": "={{ $json.emailHtml }}",
+        "options": {}
+      },
+      "id": "send-gmail-briefing-v2",
+      "name": "Send Professional Briefing via Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1740,
+        440
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "RM3fkL69SUjGzp8v",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On Form Submission (V2)": {
+      "main": [
+        [
+          {
+            "node": "Resolve Target & Horizon Scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \u2018Execute workflow\u2019": {
+      "main": [
+        [
+          {
+            "node": "Resolve Target & Horizon Scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule: Bi-Weekly Horizon Scan": {
+      "main": [
+        [
+          {
+            "node": "Resolve Target & Horizon Scope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Target & Horizon Scope": {
+      "main": [
+        [
+          {
+            "node": "Fetch Live Market News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Live Market News": {
+      "main": [
+        [
+          {
+            "node": "Fetch Community Signals & Disruptors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Community Signals & Disruptors": {
+      "main": [
+        [
+          {
+            "node": "Synthesize Signals & Build Master Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthesize Signals & Build Master Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini Master Strategy Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Master Strategy Engine": {
+      "main": [
+        [
+          {
+            "node": "Format C-Level Mobile Dossier & Sheet Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format C-Level Mobile Dossier & Sheet Records": {
+      "main": [
+        [
+          {
+            "node": "Append to Market Radar V2 Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Professional Briefing via Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
