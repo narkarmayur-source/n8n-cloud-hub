@@ -40,6 +40,7 @@ jobs:
           docker run -d \
             --name n8n \
             -p 5678:5678 \
+            -v $(pwd)/workflows:/workflows \
             -e DB_TYPE="$DB_TYPE" \
             -e DB_POSTGRESDB_HOST="$DB_POSTGRESDB_HOST" \
             -e DB_POSTGRESDB_DATABASE="$DB_POSTGRESDB_DATABASE" \
@@ -57,8 +58,11 @@ jobs:
             -e N8N_CONCURRENCY_PRODUCTION_LIMIT="$N8N_CONCURRENCY_PRODUCTION_LIMIT" \
             docker.n8n.io/n8nio/n8n:latest
 
-          echo "Waiting 10 seconds for n8n initialization..."
-          sleep 10
+          echo "Waiting 12 seconds for n8n initialization..."
+          sleep 12
+
+          echo "Auto-importing all repository workflows into active n8n instance..."
+          docker exec -u node n8n n8n import:workflow --separate --input=/workflows || true
 
       - name: 🌐 Launch Cloudflare Tunnel
         env:
@@ -90,6 +94,15 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Status: **Running Online 24/7**" >> $GITHUB_STEP_SUMMARY
             echo "Connected to Neon PostgreSQL Database." >> $GITHUB_STEP_SUMMARY
+
+            # Persist live URL to live-status branch
+            git config user.name "n8n-bot"
+            git config user.email "bot@n8n.io"
+            git checkout -B live-status
+            echo "$TUNNEL_URL" > URL.txt
+            git add URL.txt
+            git commit -m "chore: update live tunnel URL to $TUNNEL_URL [skip ci]" || true
+            git push origin live-status -f || true
           fi
 
       - name: ⏳ Keep Alive for 5 Hours 15 Minutes
