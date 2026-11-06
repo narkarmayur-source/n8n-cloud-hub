@@ -1,0 +1,106 @@
+name: 🚀 n8n 24/7 Cloud Runner (7 GB RAM)
+
+on:
+  workflow_dispatch: # Allows manual one-click start
+  schedule:
+    - cron: '0 */5 * * *' # Auto-scheduled shift rotation every 5 hours
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  run-n8n:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350 # Max ~5.8 hours per shift
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup and Start n8n Container
+        env:
+          DB_TYPE: postgresdb
+          DB_POSTGRESDB_HOST: ${{ secrets.DB_HOST }}
+          DB_POSTGRESDB_DATABASE: ${{ secrets.DB_NAME }}
+          DB_POSTGRESDB_USER: ${{ secrets.DB_USER }}
+          DB_POSTGRESDB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_POSTGRESDB_PORT: "5432"
+          DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"
+          N8N_ENCRYPTION_KEY: ${{ secrets.N8N_ENCRYPTION_KEY }}
+          N8N_DEFAULT_BINARY_DATA_MODE: filesystem
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          EXECUTIONS_DATA_SAVE_ON_SUCCESS: none
+          EXECUTIONS_DATA_SAVE_ON_ERROR: all
+          EXECUTIONS_DATA_PRUNE: "true"
+          EXECUTIONS_DATA_MAX_AGE: "24"
+          N8N_CONCURRENCY_PRODUCTION_LIMIT: "5"
+        run: |
+          echo "Starting n8n container with 7 GB RAM allocation..."
+          docker run -d \
+            --name n8n \
+            -p 5678:5678 \
+            -e DB_TYPE="$DB_TYPE" \
+            -e DB_POSTGRESDB_HOST="$DB_POSTGRESDB_HOST" \
+            -e DB_POSTGRESDB_DATABASE="$DB_POSTGRESDB_DATABASE" \
+            -e DB_POSTGRESDB_USER="$DB_POSTGRESDB_USER" \
+            -e DB_POSTGRESDB_PASSWORD="$DB_POSTGRESDB_PASSWORD" \
+            -e DB_POSTGRESDB_PORT="$DB_POSTGRESDB_PORT" \
+            -e DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED="$DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED" \
+            -e N8N_ENCRYPTION_KEY="$N8N_ENCRYPTION_KEY" \
+            -e N8N_DEFAULT_BINARY_DATA_MODE="$N8N_DEFAULT_BINARY_DATA_MODE" \
+            -e NODE_OPTIONS="$NODE_OPTIONS" \
+            -e EXECUTIONS_DATA_SAVE_ON_SUCCESS="$EXECUTIONS_DATA_SAVE_ON_SUCCESS" \
+            -e EXECUTIONS_DATA_SAVE_ON_ERROR="$EXECUTIONS_DATA_SAVE_ON_ERROR" \
+            -e EXECUTIONS_DATA_PRUNE="$EXECUTIONS_DATA_PRUNE" \
+            -e EXECUTIONS_DATA_MAX_AGE="$EXECUTIONS_DATA_MAX_AGE" \
+            -e N8N_CONCURRENCY_PRODUCTION_LIMIT="$N8N_CONCURRENCY_PRODUCTION_LIMIT" \
+            docker.n8n.io/n8nio/n8n:latest
+
+          echo "Waiting 10 seconds for n8n initialization..."
+          sleep 10
+
+      - name: 🌐 Launch Cloudflare Tunnel
+        env:
+          CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+        run: |
+          echo "Downloading cloudflared binary..."
+          curl -sL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
+          if [ -n "$CLOUDFLARE_TUNNEL_TOKEN" ]; then
+            echo "🚀 Starting Named Cloudflare Tunnel (Fixed Domain)..."
+            cloudflared tunnel run --token "$CLOUDFLARE_TUNNEL_TOKEN" &
+          else
+            echo "⚡ Starting Quick Cloudflare Tunnel..."
+            cloudflared tunnel --url http://localhost:5678 --logfile tunnel.log &
+            
+            # Wait for tunnel initialization
+            sleep 10
+            TUNNEL_URL=$(grep -oE 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' tunnel.log | head -n 1)
+            
+            echo "=========================================================="
+            echo "🎉 YOUR LIVE N8N URL: $TUNNEL_URL"
+            echo "=========================================================="
+            
+            # Post directly to GitHub Actions Job Summary UI
+            echo "## ⚡ Your Live n8n URL (7 GB RAM)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 👉 **[$TUNNEL_URL]($TUNNEL_URL)**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Status: **Running Online 24/7**" >> $GITHUB_STEP_SUMMARY
+            echo "Connected to Neon PostgreSQL Database." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: ⏳ Keep Alive for 5 Hours 15 Minutes
+        run: |
+          echo "n8n is running smoothly with 7 GB RAM..."
+          sleep 18900
+
+      - name: 🔄 Trigger Next Shift Runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Triggering next 5.5-hour shift..."
+          gh workflow run n8n.yml --ref main || true
+          sleep 600
