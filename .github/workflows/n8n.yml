@@ -39,6 +39,8 @@ jobs:
           EXECUTIONS_DATA_PRUNE: "true"
           EXECUTIONS_DATA_MAX_AGE: "24"
           N8N_CONCURRENCY_PRODUCTION_LIMIT: "5"
+          GENERIC_TIMEZONE: "Asia/Kolkata"
+          TZ: "Asia/Kolkata"
         run: |
           echo "Starting single dedicated n8n container with 7 GB RAM allocation..."
           docker run -d \
@@ -59,6 +61,8 @@ jobs:
             -e EXECUTIONS_DATA_PRUNE="$EXECUTIONS_DATA_PRUNE" \
             -e EXECUTIONS_DATA_MAX_AGE="$EXECUTIONS_DATA_MAX_AGE" \
             -e N8N_CONCURRENCY_PRODUCTION_LIMIT="$N8N_CONCURRENCY_PRODUCTION_LIMIT" \
+            -e GENERIC_TIMEZONE="$GENERIC_TIMEZONE" \
+            -e TZ="$TZ" \
             docker.n8n.io/n8nio/n8n:latest
 
           echo "Waiting 12 seconds for n8n initialization..."
