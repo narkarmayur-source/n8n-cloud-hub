@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: '0 */5 * * *' # Auto-scheduled shift rotation every 5 hours
 
+concurrency:
+  group: n8n-single-runner
+  cancel-in-progress: true # Ensures only 1 runner is ever active at a time
+
 permissions:
   contents: write
   actions: write
@@ -36,11 +40,10 @@ jobs:
           EXECUTIONS_DATA_MAX_AGE: "24"
           N8N_CONCURRENCY_PRODUCTION_LIMIT: "5"
         run: |
-          echo "Starting n8n container with 7 GB RAM allocation..."
+          echo "Starting single dedicated n8n container with 7 GB RAM allocation..."
           docker run -d \
             --name n8n \
             -p 5678:5678 \
-            -v $(pwd)/workflows:/workflows \
             -e DB_TYPE="$DB_TYPE" \
             -e DB_POSTGRESDB_HOST="$DB_POSTGRESDB_HOST" \
             -e DB_POSTGRESDB_DATABASE="$DB_POSTGRESDB_DATABASE" \
@@ -60,9 +63,6 @@ jobs:
 
           echo "Waiting 12 seconds for n8n initialization..."
           sleep 12
-
-          echo "Auto-importing all repository workflows into active n8n instance..."
-          docker exec -u node n8n n8n import:workflow --separate --input=/workflows || true
 
       - name: 🌐 Launch Cloudflare Tunnel
         env:
@@ -92,7 +92,7 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### 👉 **[$TUNNEL_URL]($TUNNEL_URL)**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Status: **Running Online 24/7**" >> $GITHUB_STEP_SUMMARY
+            echo "Status: **Running Online 24/7 (Single Instance)**" >> $GITHUB_STEP_SUMMARY
             echo "Connected to Neon PostgreSQL Database." >> $GITHUB_STEP_SUMMARY
 
             # Persist live URL to live-status branch
